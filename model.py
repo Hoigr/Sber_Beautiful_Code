@@ -1,74 +1,71 @@
-from matplotlib import pyplot as plt
-import pandas as pd
-from sklearn.model_selection import train_test_split as tts
-import seaborn as sns
-from string import ascii_lowercase, ascii_uppercase, digits, punctuation
+from data import Data
+from catboost import CatBoostClassifier
 
- 
-class Data:
-    def __init__(self, url:str)->None:
-        self.df = pd.read_csv(url)
-        self.xTrain = None
-        self.xTest = None
-        self.yTrain = None
-        self.yTest = None
-        
-    # Разбиение датасета на тренировочную и тестовую часть 
-    def split(self)->None:
-        colY = 'strength'
-        colX = [i for i in self.df.columns if i in ('strength', 'password')]
-        self.xTrain, self.xTest, self.yTrain, self.yTest = tts(self.df[colX],
-                                                               self.df[colY],
-                                                               test_size=0.25)
-        
-    def dsStats(self)->None:
-        for col in self.df.columns:
-            nan = 100*self.df[col].isna().sum()/len(self.df[col])
-            print(f'{col}: кол-во пропущенных значений - {nan}%')
-        sns.histplot(self.df['strength'])
-        plt.show()
-    # Добавим дополнительный агрегированные признаки    
-    def aggFeatures(self)->None:
-        def check(obj:str, sample:str)->int:
-            out = 0
-            for i in obj:
-                if i in sample:
-                    out += 1
-            return out
-        def checkNot(obj:str)->int:
-            out = 0
-            for i in obj:
-                if i not in ascii_lowercase + ascii_uppercase + digits + punctuation:
-                    out +=1
-            return out
+import pickle
 
-        # Агрегированные признаки - кол-во латинских букв строчных
-        self.df['lowCount'] = self.df['password'].map(lambda x:check(x, ascii_lowercase))
-        # Агрегированные признаки - кол-во латинских букв заглавных
-        self.df['upCount'] = self.df['password'].map(lambda x:check(x, ascii_uppercase))
-        # Агрегированные признаки - кол-во чисел
-        self.df['digitCount'] = self.df['password'].map(lambda x:check(x, digits))
-        # Агрегированные признаки - кол-во специальных символов
-        self.df['symbolCount'] = self.df['password'].map(lambda x:check(x, punctuation))
-        # Агрегированные признаки - кол-во всех остальных символов
-        self.df['allCount'] = self.df['password'].map(lambda x:checkNot(x))
-        # Агрегированные признаки - длинна пароля
-        self.df['len'] = self.df['password'].map(lambda x:len(x))
-        # Агрегированные признаки - кол-во бит энтропии
-        self.df['entrop'] = (self.df['digitCount']+self.df['upCount']+self.df['lowCount'])*5.9542+(self.df['symbolCount']+self.df['allCount'])*6.5699
-        self.df['entrop'] = self.df['entrop'].map(lambda x: int(x))
-        
+from sklearn import svm
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import StackingClassifier
+
 class Model(Data):
-    def sklearn(self):
-        pass
-    def boost(self):
-        pass
-    def nn(self):
-        pass
-    def ans(self):
-        pass
+    def __init__(self, urlDf:str=None, urlMod:str=None):
+        super().__init__(urlDf=urlDf, urlMod=urlMod)
+        self.modAns = None
+        self.modLr = None
+        self.modBoost = None
+        self.modVec = None
+        self.models = {'ans':self.modAns,
+                       'lr':self.modLr,
+                       'boost':self.modBoost,
+                       'vec':self.modVec}
 
-url = r'passwords.csv'
-zn = Model(url=url)
-# zn.dsStats()    
-zn.aggFeatures()    
+    # Стэкинг ансамбль обучения
+    def ans(self, save:bool=False):
+        vec = svm.SVC(kernel='rbf', random_state=self.seed)
+        boost = CatBoostClassifier(iterations=1000,
+                                   learning_rate=0.01,
+                                   random_state=self.seed,
+                                   verbose=False)
+        lr = LogisticRegression(solver='newton-cholesky')
+        estimators = [('vec', vec),
+                      ('boost', boost),
+                      ('lr', lr)]
+
+
+        self.modAns = StackingClassifier( estimators=estimators,
+                                 final_estimator=LogisticRegression())
+        self.modAns.fit(self.xTrain, self.yTrain)
+        self.data['ans'] = self.modAns.predict(self.xTest)
+        if save:
+            with open(self.urlMod+'ans.pickle', 'wb') as file:
+                pickle.dump(self.modAns, file)
+
+
+    # Метод опорных векторов
+    def vector(self, save:bool=False)->None:
+        self.modVec = svm.SVC(kernel='rbf',
+                        random_state=self.seed)
+        self.modVec.fit(self.xTrain, self.yTrain)
+        self.data['svc'] = self.modVec.predict(self.xTest)
+        if save:
+            with open(self.urlMod+'svc.pickle', 'wb') as file:
+                pickle.dump(self.modVec, file)
+
+    # Градиентный бустиннг
+    def boost(self, save:bool=False)->None:
+        self.modBoost = CatBoostClassifier(iterations=600,
+                                   learning_rate=0.01,
+                                   random_state=self.seed,
+                                   verbose=False)
+        self.modBoost.fit(self.xTrain, self.yTrain)
+        self.data['boost'] = self.modBoost.predict(self.xTest)
+        if save:
+            self.modBoost.save_model(self.urlMod+'boost.cbm', format="cbm")
+
+    def lr(self, save:bool=False):
+        self.modLr = LogisticRegression(solver='newton-cholesky')
+        self.modLr.fit(self.xTrain, self.yTrain)
+        self.data['lr'] = self.modLr.predict(self.xTest)
+        if save:
+            with open(self.urlMod+'lr.pickle', 'wb') as file:
+                pickle.dump(self.modLr, file)
