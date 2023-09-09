@@ -1,8 +1,6 @@
 from model import Model
 from job import Job
-from fastapi import FastAPI
 
-api = FastAPI()
 
 def lessonModel():
     urlDf = r'passwords.csv'
