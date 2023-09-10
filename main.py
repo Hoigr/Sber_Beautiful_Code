@@ -13,7 +13,7 @@ def lessonModel():
     zn.lr(save=True)
     zn.metric()
     
-def loadPredict(password:list=None):
+def loadPredict(password:str=None):
     urlMod = r'model\\'
     pdm=Job()
     pdm.LoadMod(url=urlMod+'ans.pickle')
