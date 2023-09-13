@@ -1,5 +1,6 @@
 import pickle
 from catboost import CatBoostClassifier
+
 from data import getEntrop, getDf
 
 
@@ -36,6 +37,8 @@ def boostModel(password:str)->int:
     return int(model.predict(getDf(password))[0])
 
 def Predict(password:str, model:str)->int:
+    if len(password) == 0:
+        return -1
     if model == 'len':
         return lenModel(password)
     elif model == 'entrop':
@@ -48,7 +51,6 @@ def Predict(password:str, model:str)->int:
         return boostModel(password)
     else:
         print('Выбрана неправильная модель')
-        
 
         
         

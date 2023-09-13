@@ -14,7 +14,7 @@ def checkNot(obj:str)->int:
                 if i not in ascii_lowercase + ascii_uppercase + digits + punctuation:
                     out +=1
             return out
-        
+
 def getEntrop(password:str)->int:
     out = check(password, digits)
     out += check(password, ascii_uppercase)
