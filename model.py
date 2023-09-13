@@ -1,71 +1,54 @@
-from data import Data
-from catboost import CatBoostClassifier
-
 import pickle
-
-from sklearn import svm
-from sklearn.linear_model import LogisticRegression
-from sklearn.ensemble import StackingClassifier
-
-class Model(Data):
-    def __init__(self, urlDf:str=None, urlMod:str=None):
-        super().__init__(urlDf=urlDf, urlMod=urlMod)
-        self.modAns = None
-        self.modLr = None
-        self.modBoost = None
-        self.modVec = None
-        self.models = {'ans':self.modAns,
-                       'lr':self.modLr,
-                       'boost':self.modBoost,
-                       'vec':self.modVec}
-
-    # Стэкинг ансамбль обучения
-    def ans(self, save:bool=False):
-        vec = svm.SVC(kernel='rbf', random_state=self.seed)
-        boost = CatBoostClassifier(iterations=1000,
-                                   learning_rate=0.01,
-                                   random_state=self.seed,
-                                   verbose=False)
-        lr = LogisticRegression(solver='newton-cholesky')
-        estimators = [('vec', vec),
-                      ('boost', boost),
-                      ('lr', lr)]
+from catboost import CatBoostClassifier
+from data import getEntrop, getDf
 
 
-        self.modAns = StackingClassifier( estimators=estimators,
-                                 final_estimator=LogisticRegression())
-        self.modAns.fit(self.xTrain, self.yTrain)
-        self.data['ans'] = self.modAns.predict(self.xTest)
-        if save:
-            with open(self.urlMod+'ans.pickle', 'wb') as file:
-                pickle.dump(self.modAns, file)
+def lenModel(password:str)->int:
+    if 0 < len(password) <= 7:
+        return 0
+    elif 8 <= len(password) <= 13:
+        return 1
+    elif 14 <= len(password):
+        return 2
+    
+def entropModel(password:str)->int:
+    dataEntrop = getEntrop(password)
+    if dataEntrop < 47:
+        return 0
+    elif 47 <= dataEntrop <= 82:
+        return 1
+    elif dataEntrop >= 83:
+        return 2    
 
+def lrModel(password:str)->int:
+    with open(r'model\lrModel.pickle', 'rb') as file:
+        model = pickle.load(file)
+    return model.predict(getDf(password))[0]
 
-    # Метод опорных векторов
-    def vector(self, save:bool=False)->None:
-        self.modVec = svm.SVC(kernel='rbf',
-                        random_state=self.seed)
-        self.modVec.fit(self.xTrain, self.yTrain)
-        self.data['svc'] = self.modVec.predict(self.xTest)
-        if save:
-            with open(self.urlMod+'svc.pickle', 'wb') as file:
-                pickle.dump(self.modVec, file)
+def svcModel(password:str)->int:
+    with open(r'model\svcModel.pickle', 'rb') as file:
+        model = pickle.load(file)
+    return model.predict(getDf(password))[0]
 
-    # Градиентный бустиннг
-    def boost(self, save:bool=False)->None:
-        self.modBoost = CatBoostClassifier(iterations=600,
-                                   learning_rate=0.01,
-                                   random_state=self.seed,
-                                   verbose=False)
-        self.modBoost.fit(self.xTrain, self.yTrain)
-        self.data['boost'] = self.modBoost.predict(self.xTest)
-        if save:
-            self.modBoost.save_model(self.urlMod+'boost.cbm', format="cbm")
+def boostModel(password:str)->int:
+    model = CatBoostClassifier()
+    model.load_model(r'model\boostModel.cbm')
+    return int(model.predict(getDf(password))[0])
 
-    def lr(self, save:bool=False):
-        self.modLr = LogisticRegression(solver='newton-cholesky')
-        self.modLr.fit(self.xTrain, self.yTrain)
-        self.data['lr'] = self.modLr.predict(self.xTest)
-        if save:
-            with open(self.urlMod+'lr.pickle', 'wb') as file:
-                pickle.dump(self.modLr, file)
+def Predict(password:str, model:str)->int:
+    if model == 'len':
+        return lenModel(password)
+    elif model == 'entrop':
+        return entropModel(password)
+    elif model == 'lr':
+        return lrModel(password)
+    elif model == 'svm':
+        return svcModel(password)
+    elif model == 'boost':
+        return boostModel(password)
+    else:
+        print('Выбрана неправильная модель')
+        
+
+        
+        
