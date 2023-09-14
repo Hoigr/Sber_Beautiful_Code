@@ -39,15 +39,15 @@ def boostModel(password:str)->int:
 def Predict(password:str, model:str)->int:
     if len(password) == 0:
         return -1
-    if model == 'len':
+    if model == 'Длинна пароля':
         return lenModel(password)
-    elif model == 'entrop':
+    elif model == 'Энтропия пароля':
         return entropModel(password)
-    elif model == 'lr':
+    elif model == 'Логистическая регрессия':
         return lrModel(password)
-    elif model == 'svm':
+    elif model == 'Метод опорных векторов':
         return svcModel(password)
-    elif model == 'boost':
+    elif model == 'Градиентный бустинг':
         return boostModel(password)
     else:
         print('Выбрана неправильная модель')
