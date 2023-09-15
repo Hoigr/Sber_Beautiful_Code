@@ -17,7 +17,7 @@ PAGES = {
 }
 
 st.sidebar.title("Меню")
-selection = st.sidebar.radio("", list(PAGES.keys()))
+selection = st.sidebar.radio(label=" ", options=list(PAGES.keys()))
 
 page = PAGES[selection]
 page()

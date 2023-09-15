@@ -1,5 +1,6 @@
 import streamlit as st
-txt = '''## Красивый код соревнование от Сбера в дисциплине data science
+txt = '''### Красивый код соревнование от Сбера
+### в дисциплине data science
 
 https://beautifulcode.sber.ru/task/data_science
 
