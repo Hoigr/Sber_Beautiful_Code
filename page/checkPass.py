@@ -47,23 +47,24 @@ def pageCh():
             col = [i for i in df.columns]
             if 'password' not in col:
                 st.write('Отсутствует столбец password')
-            for met in options:
-                df[met] = df['password'].map(lambda x: Predict(x, met)) 
-            st.write(df)
-            def download_csv(dataframe):
-                csv = dataframe.to_csv(index=False)
-                return csv
+            elif len(options) > 0:
+                for met in options:
+                    df[met] = df['password'].map(lambda x: Predict(x, met)) 
+                st.write(df)
+                def download_csv(dataframe):
+                    csv = dataframe.to_csv(index=False)
+                    return csv
 
-            csv_data = download_csv(df)
-            st.download_button(label='Нажмите, чтобы скачать', 
-                                   data=csv_data, 
-                                   file_name='predict.csv', 
-                                   mime='text/csv')
+                csv_data = download_csv(df)
+                st.download_button(label='Нажмите, чтобы скачать', 
+                                    data=csv_data, 
+                                    file_name='predict.csv', 
+                                    mime='text/csv')
           
     
     with tab3:
         st.title("Сгенерировать пароль")
-        cls = st.slider('Выберите класс пароля', min_value=0, max_value=2, value=1, step=1)
+        cls = st.slider('Выберите класс пароля', min_value=0, max_value=2, value=1, step=1, key=3)
         number = st.number_input('Выбирите число паролей не более 50',min_value=1, max_value=50, value=5, step=1)
         gen = st.button("Сгенерировать", type="primary")
         out = []
