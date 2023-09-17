@@ -1,11 +1,11 @@
 import streamlit as st
-from page.oModel  import infModel
-from page.checkPass import pageCh
-from page.about import about
+from oModel  import infModel
+from checkPass import pageCh
+from about import about
 
 st.set_page_config(
     page_title="SBER Beautiful Code",
-    page_icon=r"page\images\icon.png",
+    page_icon=r"icon.png",
 )
 
          

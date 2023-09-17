@@ -36,7 +36,7 @@ def entropModel(**kwarg )->int | pd.DataFrame:
         return kwarg['df']   
 
 def lrModel(**kwarg)->int | pd.DataFrame:
-    with open(r'model\lrModel.pickle', 'rb') as file:
+    with open(r'lrModel.pickle', 'rb') as file:
         model = pickle.load(file)
     if 'password' in kwarg:
         return model.predict(getDf(kwarg['password']))[0]
@@ -45,7 +45,7 @@ def lrModel(**kwarg)->int | pd.DataFrame:
         return kwarg['df'] 
 
 def svcModel(**kwarg)->int | pd.DataFrame:
-    with open(r'model\svcModel.pickle', 'rb') as file:
+    with open(r'svcModel.pickle', 'rb') as file:
         model = pickle.load(file)
     if 'password' in kwarg:
         return model.predict(getDf(kwarg['password']))[0]
@@ -55,7 +55,7 @@ def svcModel(**kwarg)->int | pd.DataFrame:
 
 def boostModel(**kwarg)->int | pd.DataFrame:
     model = CatBoostClassifier()
-    model.load_model(r'model\boostModel.cbm')
+    model.load_model(r'boostModel.cbm')
     if 'password' in kwarg:
         return int(model.predict(getDf(kwarg['password']))[0])
     if 'df' in kwarg:

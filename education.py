@@ -37,13 +37,13 @@ class Model(Data):
                                      max_iter=150)
         lrModel.fit(self.x_train, self.y_train)
         if save:
-            self._saveModel(model=lrModel, name=r'model\lrModel')
+            self._saveModel(model=lrModel, name=r'lrModel')
     
     def svcModel(self, save:bool=False)->None:
         svcModel = SVC(kernel='rbf')
         svcModel.fit(self.x_train, self.y_train)
         if save:
-            self._saveModel(model=svcModel, name=r'model\svcModel')
+            self._saveModel(model=svcModel, name=r'svcModel')
             
     def boost(self, save:bool=False)->None:
         boostModel = CatBoostClassifier(iterations=1000,
@@ -52,7 +52,7 @@ class Model(Data):
                                         verbose=False)
         boostModel.fit(self.x_train, self.y_train)
         if save:
-            boostModel.save_model(r'model\boostModel.cbm', format="cbm")
+            boostModel.save_model(r'boostModel.cbm', format="cbm")
         
             
         
