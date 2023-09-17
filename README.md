@@ -21,6 +21,6 @@ https://beautifulcode.sber.ru/task/data_science
 - Генерация пароля заданного класса
 
 #### Ссылки:
-Датасет: https://drive.google.com/file/d/1TiS_LtghQqCaFNyeOU6UTUghKfhy4Qbq/view?usp=sharing
-jupyter notebook: https://colab.research.google.com/drive/1TThTmXMkRvQg9sITchuodF3rBl9Y3IVU?usp=sharing
-Приложение: https://sberbeautifulcode-4kuzykqjzmpq4wq6uhcur6.streamlit.app/
+- Датасет: https://drive.google.com/file/d/1TiS_LtghQqCaFNyeOU6UTUghKfhy4Qbq/view?usp=sharing
+- Jupyter notebook: https://colab.research.google.com/drive/1TThTmXMkRvQg9sITchuodF3rBl9Y3IVU?usp=sharing
+- Приложение: https://sberbeautifulcode-4kuzykqjzmpq4wq6uhcur6.streamlit.app/
