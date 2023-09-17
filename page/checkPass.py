@@ -3,6 +3,7 @@ from model import Predict
 import pandas as pd
 from string import ascii_lowercase, ascii_uppercase, digits, punctuation
 from random import randint, sample
+from data import getEntrop
 
 
 def pageCh():
@@ -26,7 +27,7 @@ def pageCh():
         else:
             if len(options) > 0:
                 for i in options:
-                    clPass = Predict(password, i)
+                    clPass = Predict(model=i, password=password)
                     st.write(f'Модель {i} - {clPass}')
                 r1 = f'- Увеличить длинну пароля от {9-len(password)} до {12-len(password)} символов что бы пароль подпадал под класс 1'
                 r2 = f'- Увеличить длинну пароля от {15-len(password)} символов что бы пароль подпадал под класс 2'
@@ -43,8 +44,7 @@ def pageCh():
     with tab2:
         st.header("Проверить файл с паролями")
         st.text('Загрузите файл с паролями для проверки в формате csv.')
-        st.text('Файл должен содержать столбец password который будет проверятся.')
-        st.text('Предупреждение! Некоторые методы могут медленно работать на больших массивах данных.')        
+        st.text('Файл должен содержать столбец password который будет проверятся.') 
         options = st.multiselect(
             label='Выберите модель для предсказания класса пароля',
             options=['Градиентный бустинг', 
@@ -60,8 +60,14 @@ def pageCh():
             if 'password' not in col:
                 st.write('Отсутствует столбец password')
             elif len(options) > 0:
+                df = df[df['password'] != '']
+                df['len'] = df['password'].map(len)
+                df['entrop'] = df['password'].map(getEntrop)
+                df = df[['password', 'len', 'entrop']]
+
                 for met in options:
-                    df[met] = df['password'].map(lambda x: Predict(x, met)) 
+                    Predict(model=met, df=df)
+                df = df[[i for i in df.columns if i not in ('len', 'entrop')]]
                 st.write(df)
                 def download_csv(dataframe):
                     csv = dataframe.to_csv(index=False)
