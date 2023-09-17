@@ -5,7 +5,7 @@ from page.about import about
 
 st.set_page_config(
     page_title="SBER Beautiful Code",
-    page_icon=r"icon.png",
+    page_icon=r"page\images\icon.png",
 )
 
          
@@ -21,3 +21,4 @@ selection = st.sidebar.radio(label=" ", options=list(PAGES.keys()))
 
 page = PAGES[selection]
 page()
+

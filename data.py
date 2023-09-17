@@ -27,7 +27,5 @@ def getDf(password:str)->pd.DataFrame:
     out = pd.DataFrame()
     out['len'] = [len(password)]
     out['entrop'] = [getEntrop(password)]
-    out['UniqUpCount'] = [check(set(password), ascii_uppercase)]
-    out['upCount'] = [check(password, ascii_uppercase)]
     return out
       

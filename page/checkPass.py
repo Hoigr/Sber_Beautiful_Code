@@ -6,7 +6,7 @@ from random import randint, sample
 
 
 def pageCh():
-    st.image(r'page\passLogo.webp', width=250)
+    st.image(r'page\images\passLogo.webp', width=250)
     tab1, tab2, tab3 = st.tabs(["Проверить пароль", "Проверить файл с паролями", "Сгенерировать пароль"])
     with tab1:
         st.title("Проверить пароль") 
